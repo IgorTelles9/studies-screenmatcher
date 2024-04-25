@@ -1,5 +1,6 @@
 package com.igor.screenmatch.main;
 
+import com.igor.screenmatch.model.Episode;
 import com.igor.screenmatch.model.EpisodeData;
 import com.igor.screenmatch.model.SeasonData;
 import com.igor.screenmatch.model.SeriesData;
@@ -29,7 +30,7 @@ public class Main {
         System.out.println(series);
         episodeList.forEach(System.out::println);
         System.out.println("Best rated episodes: ");
-        List<EpisodeData> topEps = this.getBestEpisodes(seasons, 5);
+        List<Episode> topEps = this.getBestEpisodes(seasons, 5);
         topEps.forEach(System.out::println);
 
     }
@@ -87,15 +88,15 @@ public class Main {
                 .collect(Collectors.toList());
     }
 
-    private List<EpisodeData> getBestEpisodes (List<SeasonData> seasons, int top){
-        List<EpisodeData> episodes = seasons.stream()
-                .flatMap(s -> s.episodes().stream())
-                .toList();
-        return episodes.stream()
-                .filter( e -> !e.score().equalsIgnoreCase("n/a"))
-                .sorted(Comparator.comparing(EpisodeData::score).reversed())
-                .limit(top)
+    private List<Episode> getBestEpisodes (List<SeasonData> seasons, int top){
+        List<Episode> episodes = seasons.stream()
+                .flatMap(s -> s.episodes().stream()
+                        .map( e -> new Episode(s.number(), e)))
                 .toList();
 
+        return episodes.stream()
+                .sorted(Comparator.comparing(Episode::getScore).reversed())
+                .limit(top)
+                .toList();
     }
 }
