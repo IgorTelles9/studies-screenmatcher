@@ -1,10 +1,17 @@
 package com.igor.screenmatch;
 
+import com.igor.screenmatch.main.Main;
+import com.igor.screenmatch.model.EpisodeData;
+import com.igor.screenmatch.model.MovieData;
+import com.igor.screenmatch.model.SeasonData;
+import com.igor.screenmatch.model.SeriesData;
 import com.igor.screenmatch.service.APIExtract;
 import com.igor.screenmatch.service.DataParser;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.ArrayList;
 
 @SpringBootApplication
 public class ScreenmatchApplication implements CommandLineRunner {
@@ -15,13 +22,8 @@ public class ScreenmatchApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		var api = new APIExtract();
-		String res = api.getData("https://www.omdbapi.com/?i=tt3896198&apikey=328befac");
-		System.out.println(res);
-		DataParser parser = new DataParser();
-		MovieData movie = parser.getData(res, MovieData.class);
-		System.out.println(movie);
+
+		Main main = new Main();
+		main.showMenu();
 	}
-
-
 }

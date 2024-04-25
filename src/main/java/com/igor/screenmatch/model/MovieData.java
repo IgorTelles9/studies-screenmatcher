@@ -1,4 +1,4 @@
-package com.igor.screenmatch;
+package com.igor.screenmatch.model;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
