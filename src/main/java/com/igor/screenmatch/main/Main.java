@@ -7,6 +7,7 @@ import com.igor.screenmatch.service.APIExtract;
 import com.igor.screenmatch.service.DataParser;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -22,9 +23,15 @@ public class Main {
     public void showMenu(){
         String searched = this.getSearch();
         SeriesData series = this.getSeries(searched);
-        List<List<String>> seasons = this.getSeasons(searched, series);
+        List<List<String>> episodeList = this.getSeasonsEpisodes(searched, series);
+        List<SeasonData> seasons = this.getSeasons(searched, series);
+        System.out.println("Results:");
         System.out.println(series);
-        seasons.forEach(System.out::println);
+        episodeList.forEach(System.out::println);
+        System.out.println("Best rated episodes: ");
+        List<EpisodeData> topEps = this.getBestEpisodes(seasons, 5);
+        topEps.forEach(System.out::println);
+
     }
 
     private String getSearch(){
@@ -39,11 +46,20 @@ public class Main {
         return this.parser.getData(response, SeriesData.class);
     }
 
-    private ArrayList<List<String>> getSeasons(String searched, SeriesData series){
+    private ArrayList<List<String>> getSeasonsEpisodes(String searched, SeriesData series){
         ArrayList<List<String>> seasons = new ArrayList<>();
         for (int i = 1; i <= series.seasons(); i++){
             String address = this.buildSeasonSearchAddress(searched, i);
             seasons.add(this.getEpisodesTitle(this.getSeason(address)));
+        }
+        return seasons;
+    }
+
+    private List<SeasonData> getSeasons (String searched, SeriesData series){
+        List<SeasonData> seasons = new ArrayList<>();
+        for (int i = 1; i <= series.seasons(); i++){
+            String address = this.buildSeasonSearchAddress(searched, i);
+            seasons.add(this.getSeason(address));
         }
         return seasons;
     }
@@ -69,5 +85,17 @@ public class Main {
         return season.episodes().stream()
                 .map(EpisodeData::title)
                 .collect(Collectors.toList());
+    }
+
+    private List<EpisodeData> getBestEpisodes (List<SeasonData> seasons, int top){
+        List<EpisodeData> episodes = seasons.stream()
+                .flatMap(s -> s.episodes().stream())
+                .toList();
+        return episodes.stream()
+                .filter( e -> !e.score().equalsIgnoreCase("n/a"))
+                .sorted(Comparator.comparing(EpisodeData::score).reversed())
+                .limit(top)
+                .toList();
+
     }
 }
